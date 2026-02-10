@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pragmática y Comunicación</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        h1, h2, h3, .serif {
+            font-family: 'Playfair Display', serif;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        
+        .placeholder-box {
+            background-image: repeating-linear-gradient(45deg, #f1f5f9 25%, transparent 25%, transparent 75%, #f1f5f9 75%, #f1f5f9), repeating-linear-gradient(45deg, #f1f5f9 25%, #f8fafc 25%, #f8fafc 75%, #f1f5f9 75%, #f1f5f9);
+            background-position: 0 0, 10px 10px;
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Icons placeholder (Since Lucide React isn't directly importable via simple CDN without build step in this specific format, using SVG wrappers or basic text icons for simplicity in standalone file)
+        const Icon = ({ name }) => {
+            // Mapping essential icons manually for standalone stability
+            const icons = {
+                book: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>,
+                users: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+                message: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
+                bulb: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>,
+                menu: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
+                chevronRight: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>,
+                check: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            };
+            return icons[name] || null;
+        };
+
+        const sections = [
+            { id: 'intro', title: 'Inicio', icon: 'bulb' },
+            { id: 'ch1', title: 'Funciones del Lenguaje', icon: 'message' },
+            { id: 'ch2', title: 'Actos de Habla', icon: 'users' },
+            { id: 'case', title: 'Caso de Estudio', icon: 'book' },
+            { id: 'glossary', title: 'Glosario', icon: 'book' },
+            { id: 'biblio', title: 'Bibliografía', icon: 'book' }
+        ];
+
+        // --- COMPONENTS ---
+
+        const NavButton = ({ active, onClick, children, icon }) => (
+            <button 
+                onClick={onClick}
+                className={`w-full flex items-center p-4 transition-all duration-300 ${active ? 'bg-blue-900 text-white border-r-4 border-yellow-500' : 'text-slate-500 hover:bg-slate-100'}`}
+            >
+                <span className="mr-3"><Icon name={icon} /></span>
+                <span className="font-semibold text-sm uppercase tracking-wide hidden md:inline-block">{children}</span>
+            </button>
+        );
+
+        const SectionTitle = ({ children, subtitle }) => (
+            <div className="mb-8 border-b border-slate-200 pb-4">
+                <h2 className="text-4xl font-bold text-slate-800 serif mb-2">{children}</h2>
+                {subtitle && <p className="text-xl text-slate-500 font-light">{subtitle}</p>}
+            </div>
+        );
+
+        const MediaPlaceholder = ({ type, width, height, desc }) => (
+            <div className="w-full flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded-xl p-8 placeholder-box my-6" style={{ minHeight: '200px' }}>
+                <div className="text-slate-400 mb-2">
+                    <Icon name="bulb" />
+                </div>
+                <p className="text-slate-500 font-mono text-sm text-center font-bold">RECURSO MULTIMEDIA ({type})</p>
+                <p className="text-slate-400 text-xs mt-1 text-center">{desc}</p>
+                <p className="text-slate-300 text-xs mt-1">{width} x {height}</p>
+            </div>
+        );
+
+        // --- VIEWS ---
+
+        const IntroView = ({ onStart }) => (
+            <div className="flex flex-col items-center justify-center min-h-[80vh] text-center animate-fade-in px-4">
+                <div className="max-w-4xl">
+                    <span className="inline-block py-1 px-3 rounded-full bg-yellow-100 text-yellow-800 text-sm font-bold mb-6 tracking-wider">EPISTEMOLOGÍA DEL LENGUAJE</span>
+                    <h1 className="text-5xl md:text-7xl font-bold text-slate-900 mb-6 serif leading-tight">
+                        Pragmática y <span className="text-blue-700">Comunicación</span>
+                    </h1>
+                    <p className="text-xl md:text-2xl text-slate-600 mb-10 font-light leading-relaxed">
+                        Un viaje interactivo desde el signo lingüístico hasta la acción social. Descubre las Funciones del Lenguaje y la Teoría de los Actos de Habla.
+                    </p>
+                    
+                    <MediaPlaceholder type="ANIMACIÓN" width="800px" height="300px" desc="Animación conceptual: Hilos conectando personas y palabras que se transforman en acciones" />
+
+                    <button 
+                        onClick={onStart}
+                        className="mt-8 bg-blue-700 hover:bg-blue-800 text-white font-bold py-4 px-10 rounded-full shadow-lg transform hover:-translate-y-1 transition-all duration-300 flex items-center mx-auto text-lg"
+                    >
+                        Comenzar Exploración <span className="ml-2"><Icon name="chevronRight"/></span>
+                    </button>
+                </div>
+            </div>
+        );
+
+        const Chapter1View = () => {
+            const [activeTab, setActiveTab] = useState('jakobson');
+
+            const jakobsonFunctions = [
+                { name: "Referencial", factor: "Contexto", desc: "Se centra en el objeto o referente. Común en textos científicos.", ex: "El agua hierve a 100°C." },
+                { name: "Emotiva", factor: "Destinador", desc: "Enfocada en la actitud del hablante. Interjecciones y valoraciones.", ex: "¡Qué magnífica noticia!" },
+                { name: "Conativa", factor: "Destinatario", desc: "Busca producir una reacción. Imperativos y vocativos.", ex: "Cierre la puerta, por favor." },
+                { name: "Fática", factor: "Contacto", desc: "Establece, prolonga o interrumpe la comunicación.", ex: "¿Me oyes? Sí, claro." },
+                { name: "Metalingüística", factor: "Código", desc: "Se usa para hablar del propio lenguaje.", ex: "'Pragmática' viene del griego." },
+                { name: "Poética", factor: "Mensaje", desc: "Se centra en la forma del mensaje. Publicidad y arte.", ex: "En casa de herrero, cuchillo de palo." },
+            ];
+
+            return (
+                <div className="animate-fade-in max-w-6xl mx-auto">
+                    <SectionTitle subtitle="De la estructura a la intención comunicativa">Capítulo 1: Funciones del Lenguaje</SectionTitle>
+                    
+                    <div className="flex space-x-4 mb-8 border-b">
+                        <button onClick={() => setActiveTab('jakobson')} className={`pb-3 px-4 font-bold text-lg ${activeTab === 'jakobson' ? 'text-blue-700 border-b-4 border-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>Modelo Jakobson</button>
+                        <button onClick={() => setActiveTab('halliday')} className={`pb-3 px-4 font-bold text-lg ${activeTab === 'halliday' ? 'text-blue-700 border-b-4 border-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>Visión Halliday</button>
+                        <button onClick={() => setActiveTab('app')} className={`pb-3 px-4 font-bold text-lg ${activeTab === 'app' ? 'text-blue-700 border-b-4 border-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>Aplicación Pedagógica</button>
+                    </div>
+
+                    {activeTab === 'jakobson' && (
+                        <div>
+                            <p className="mb-6 text-lg text-slate-700">Roman Jakobson (1960) vincula cada función a un factor constitutivo del acto comunicativo. Haz clic en las tarjetas para explorar.</p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {jakobsonFunctions.map((func, idx) => (
+                                    <div key={idx} className="bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-500 hover:shadow-xl transition-shadow cursor-pointer group">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <h3 className="text-xl font-bold text-slate-800">{func.name}</h3>
+                                            <span className="text-xs font-semibold bg-slate-100 text-slate-500 px-2 py-1 rounded">{func.factor}</span>
+                                        </div>
+                                        <p className="text-slate-600 text-sm mb-4">{func.desc}</p>
+                                        <div className="bg-yellow-50 p-3 rounded text-yellow-800 text-sm italic border border-yellow-100">
+                                            "{func.ex}"
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <MediaPlaceholder type="IMAGEN" width="100%" height="400px" desc="Infografía interactiva del Esquema de la Comunicación de Jakobson conectando factores y funciones" />
+                        </div>
+                    )}
+
+                    {activeTab === 'halliday' && (
+                        <div className="bg-white p-8 rounded-2xl shadow-lg">
+                            <h3 className="text-2xl font-bold mb-4 text-blue-900">La Crítica Sistémico-Funcional</h3>
+                            <p className="mb-6 text-lg text-slate-700">A diferencia de Jakobson, M.A.K. Halliday propone que el lenguaje cumple <strong>tres metafunciones simultáneamente</strong> en cualquier enunciado, no solo una predominante.</p>
+                            
+                            <div className="space-y-6">
+                                <div className="flex items-start">
+                                    <div className="bg-indigo-100 p-3 rounded-lg mr-4"><Icon name="bulb" /></div>
+                                    <div>
+                                        <h4 className="text-xl font-bold text-indigo-900">Metafunción Ideacional</h4>
+                                        <p className="text-slate-600">Representa la experiencia del mundo y la lógica interna. ¿Qué está pasando? ¿Quiénes participan?</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start">
+                                    <div className="bg-pink-100 p-3 rounded-lg mr-4"><Icon name="users" /></div>
+                                    <div>
+                                        <h4 className="text-xl font-bold text-pink-900">Metafunción Interpersonal</h4>
+                                        <p className="text-slate-600">Establece relaciones sociales, roles y actitudes. Negociación, juicios y modalidad.</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start">
+                                    <div className="bg-teal-100 p-3 rounded-lg mr-4"><Icon name="book" /></div>
+                                    <div>
+                                        <h4 className="text-xl font-bold text-teal-900">Metafunción Textual</h4>
+                                        <p className="text-slate-600">Crea coherencia y cohesión. Estructura la información (tema/rema) para que tenga sentido en contexto.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                     {activeTab === 'app' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                             <div className="bg-gradient-to-br from-blue-50 to-white p-6 rounded-xl border border-blue-100">
+                                <h3 className="text-xl font-bold text-blue-800 mb-3">Análisis de Textos</h3>
+                                <p className="text-slate-700">Identificar funciones predominantes ayuda a comprender el propósito del autor. (Ej. Periodístico vs. Poético).</p>
+                             </div>
+                             <div className="bg-gradient-to-br from-orange-50 to-white p-6 rounded-xl border border-orange-100">
+                                <h3 className="text-xl font-bold text-orange-800 mb-3">Producción Escrita</h3>
+                                <p className="text-slate-700">Solicitar narrar un mismo evento desde diferentes funciones (informe policial vs. email a amigo) desarrolla versatilidad.</p>
+                             </div>
+                             <div className="col-span-1 md:col-span-2">
+                                 <MediaPlaceholder type="VIDEO" width="100%" height="350px" desc="Video explicativo: Ejemplo de actividad en aula aplicando funciones del lenguaje" />
+                             </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const Chapter2View = () => {
+            const [searleOpen, setSearleOpen] = useState(null);
+
+            const toggleSearle = (index) => {
+                setSearleOpen(searleOpen === index ? null : index);
+            };
+
+            const acts = [
+                { type: "Asertivos", desc: "Compromiso con la verdad (afirmar, concluir).", dir: "Palabra → Mundo" },
+                { type: "Directivos", desc: "Intento de que el oyente haga algo (ordenar, pedir).", dir: "Mundo → Palabra" },
+                { type: "Comisivos", desc: "Compromiso del hablante a una acción futura (prometer, jurar).", dir: "Mundo → Palabra" },
+                { type: "Expresivos", desc: "Expresión de estado psicológico (felicitar, agradecer).", dir: "Sin dirección" },
+                { type: "Declarativos", desc: "Cambio de realidad institucional (bautizar, sentenciar).", dir: "Doble dirección" },
+            ];
+
+            return (
+                <div className="animate-fade-in max-w-5xl mx-auto">
+                    <SectionTitle subtitle="Decir es Hacer: Austin y Searle">Capítulo 2: Teoría de los Actos de Habla</SectionTitle>
+
+                    <div className="bg-slate-900 text-white rounded-2xl p-8 mb-10 relative overflow-hidden">
+                        <div className="relative z-10">
+                            <h3 className="text-2xl font-bold mb-4 text-yellow-400">J.L. Austin: La Triple Dimensión</h3>
+                            <p className="mb-6">Al emitir un enunciado, realizamos tres actos simultáneos:</p>
+                            
+                            <div className="flex flex-col md:flex-row justify-between gap-4">
+                                <div className="flex-1 bg-white/10 p-4 rounded-lg backdrop-blur-sm border border-white/20">
+                                    <div className="text-yellow-400 font-bold mb-1">1. Acto Locutivo</div>
+                                    <div className="text-sm">El acto físico de emitir sonidos y palabras.</div>
+                                    <div className="mt-2 text-xs italic opacity-75">"Hace frío aquí" (Literal)</div>
+                                </div>
+                                <div className="flex-1 bg-blue-600/50 p-4 rounded-lg backdrop-blur-sm border border-blue-400/50 transform scale-105 shadow-xl">
+                                    <div className="text-white font-bold mb-1">2. Acto Ilocutivo</div>
+                                    <div className="text-sm">La intención o fuerza del hablante.</div>
+                                    <div className="mt-2 text-xs italic font-bold">Intención: Que cierren la ventana.</div>
+                                </div>
+                                <div className="flex-1 bg-white/10 p-4 rounded-lg backdrop-blur-sm border border-white/20">
+                                    <div className="text-yellow-400 font-bold mb-1">3. Acto Perlocutivo</div>
+                                    <div className="text-sm">El efecto causado en el oyente.</div>
+                                    <div className="mt-2 text-xs italic opacity-75">El oyente se levanta y cierra la ventana.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 className="text-2xl font-bold mb-6 text-slate-800">Clasificación de Searle</h3>
+                    <div className="space-y-3 mb-12">
+                        {acts.map((act, index) => (
+                            <div key={index} className="border border-slate-200 rounded-lg overflow-hidden">
+                                <button 
+                                    onClick={() => toggleSearle(index)}
+                                    className="w-full flex justify-between items-center p-4 bg-white hover:bg-slate-50 transition-colors"
+                                >
+                                    <span className="font-bold text-lg text-slate-700">{act.type}</span>
+                                    <span className={`transform transition-transform ${searleOpen === index ? 'rotate-180' : ''}`}>▼</span>
+                                </button>
+                                {searleOpen === index && (
+                                    <div className="p-4 bg-slate-50 text-slate-600 border-t border-slate-100">
+                                        <p className="mb-2">{act.desc}</p>
+                                        <span className="text-xs uppercase tracking-widest font-bold text-blue-600">Ajuste: {act.dir}</span>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded-r-xl">
+                        <h4 className="font-bold text-lg text-yellow-900 mb-2">Actos de Habla Indirectos</h4>
+                        <p className="text-yellow-800 mb-4">Cuando la forma lingüística no coincide con la fuerza ilocutiva. Es un indicador de alta competencia comunicativa.</p>
+                        <div className="bg-white p-4 rounded shadow-sm">
+                            <p className="font-mono text-sm text-slate-500">Ejemplo:</p>
+                            <p className="text-lg font-bold">"¿Puedes pasarme la sal?"</p>
+                            <div className="mt-2 flex gap-4 text-sm">
+                                <span className="text-red-500">❌ Pregunta de capacidad (Literal)</span>
+                                <span className="text-green-600 font-bold">✅ Petición cortés (Real)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const CaseStudyView = () => {
+            const [analysisVisible, setAnalysisVisible] = useState(false);
+
+            return (
+                <div className="animate-fade-in max-w-4xl mx-auto">
+                    <SectionTitle subtitle="Aplicación Práctica en Contexto Educativo">Caso de Estudio: El Aula Universitaria</SectionTitle>
+                    
+                    <div className="mb-8">
+                        <p className="text-lg mb-4">Analicemos el siguiente intercambio real. <span className="font-bold text-blue-600">Haz clic en "Revelar Análisis"</span> para ver la dimensión pragmática oculta.</p>
+                    </div>
+
+                    <div className="space-y-6 mb-8">
+                        {/* Exchange 1 */}
+                        <div className="flex gap-4 items-start">
+                            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold">P</div>
+                            <div className="flex-1">
+                                <div className="bg-white p-4 rounded-br-xl rounded-tr-xl rounded-bl-xl shadow-sm border border-slate-100">
+                                    <p className="font-serif text-lg text-slate-800">"Bien, eso sería todo por hoy. Para la próxima sesión, <span className="bg-yellow-100 px-1">sería una excelente idea</span> que revisaran el capítulo 3 de Escandell Vidal."</p>
+                                </div>
+                                {analysisVisible && (
+                                    <div className="mt-2 p-3 bg-blue-50 text-blue-900 text-sm rounded border-l-2 border-blue-400 animate-fade-in">
+                                        <strong>Análisis:</strong> Acto Directivo (instrucción) disfrazado de Asertivo (sugerencia) para suavizar la imposición. Función Conativa + Interpersonal.
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Exchange 2 */}
+                        <div className="flex gap-4 items-start flex-row-reverse">
+                            <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold">E</div>
+                            <div className="flex-1">
+                                <div className="bg-green-50 p-4 rounded-bl-xl rounded-tl-xl rounded-br-xl shadow-sm border border-green-100 text-right">
+                                    <p className="font-serif text-lg text-slate-800">"Profesora, <span className="bg-yellow-100 px-1">¿la lectura es obligatoria?</span>"</p>
+                                </div>
+                                {analysisVisible && (
+                                    <div className="mt-2 p-3 bg-green-100 text-green-900 text-sm rounded border-r-2 border-green-500 text-right animate-fade-in">
+                                        <strong>Análisis:</strong> Función Metalingüística y Fática. Busca confirmar la fuerza ilocutiva de la orden anterior.
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                         {/* Exchange 3 */}
+                         <div className="flex gap-4 items-start">
+                            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold">P</div>
+                            <div className="flex-1">
+                                <div className="bg-white p-4 rounded-br-xl rounded-tr-xl rounded-bl-xl shadow-sm border border-slate-100">
+                                    <p className="font-serif text-lg text-slate-800">"<span className="bg-yellow-100 px-1">Quienes deseen participar activamente</span> en el debate encontrarán en el texto las herramientas necesarias. Nos vemos el miércoles."</p>
+                                </div>
+                                {analysisVisible && (
+                                    <div className="mt-2 p-3 bg-blue-50 text-blue-900 text-sm rounded border-l-2 border-blue-400 animate-fade-in">
+                                        <strong>Análisis:</strong> Respuesta indirecta. No dice "Sí/No". Establece condición y consecuencia. Persuasión pragmática en lugar de autoridad directa.
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="text-center">
+                        <button 
+                            onClick={() => setAnalysisVisible(!analysisVisible)}
+                            className="bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all"
+                        >
+                            {analysisVisible ? 'Ocultar Análisis' : 'Revelar Análisis Pragmático'}
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        const GlossaryView = () => {
+            const terms = [
+                { term: "Acto de Habla", def: "Unidad fundamental de la comunicación que incluye acto locutivo, ilocutivo y perlocutivo." },
+                { term: "Acto Ilocutivo", def: "La intención o fuerza del enunciado (ordenar, prometer, etc.)." },
+                { term: "Acto Perlocutivo", def: "El efecto o consecuencia en el oyente (convencer, asustar)." },
+                { term: "Enunciado Realizativo", def: "Enunciado que ejecuta la acción que nombra (ej. 'Yo te absuelvo')." },
+                { term: "Pragmática", def: "Rama de la lingüística que estudia el lenguaje en uso y contexto." },
+                { term: "Función Conativa", def: "Función centrada en influir en el destinatario (imperativos)." },
+                { term: "Función Fática", def: "Función orientada a mantener el canal de comunicación." },
+                { term: "Fuerza Ilocutiva", def: "Propósito comunicativo específico detrás de un enunciado." },
+            ];
+
+            return (
+                <div className="animate-fade-in">
+                     <SectionTitle>Glosario Especializado</SectionTitle>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {terms.map((item, idx) => (
+                            <div key={idx} className="bg-white p-5 rounded-lg border border-slate-200 hover:border-blue-300 transition-colors">
+                                <h4 className="font-bold text-blue-800 text-lg mb-2">{item.term}</h4>
+                                <p className="text-slate-600">{item.def}</p>
+                            </div>
+                        ))}
+                     </div>
+                </div>
+            );
+        };
+
+        const BiblioView = () => (
+            <div className="animate-fade-in max-w-3xl">
+                <SectionTitle>Referencias Bibliográficas</SectionTitle>
+                <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                    <ul className="space-y-4 text-slate-700">
+                        <li className="pl-4 border-l-4 border-slate-300">
+                            <strong>Austin, J. L.</strong> (1975). <em>How to do things with words</em> (2nd ed.). Harvard University Press.
+                        </li>
+                        <li className="pl-4 border-l-4 border-slate-300">
+                            <strong>Escandell Vidal, M. V.</strong> (2013). <em>Introducción a la pragmática</em> (3ª ed.). Ariel.
+                        </li>
+                        <li className="pl-4 border-l-4 border-slate-300">
+                            <strong>Halliday, M. A. K., & Matthiessen, C. M. I. M.</strong> (2014). <em>Halliday's introduction to functional grammar</em> (4th ed.). Routledge.
+                        </li>
+                        <li className="pl-4 border-l-4 border-slate-300">
+                            <strong>Jakobson, R.</strong> (1960). Closing statement: Linguistics and poetics. In <em>Style in language</em>. MIT Press.
+                        </li>
+                        <li className="pl-4 border-l-4 border-slate-300">
+                            <strong>Searle, J. R.</strong> (1969). <em>Speech acts: An essay in the philosophy of language</em>. Cambridge University Press.
+                        </li>
+                        <li className="pl-4 border-l-4 border-slate-300">
+                            <strong>Yule, G.</strong> (1996). <em>Pragmatics</em>. Oxford University Press.
+                        </li>
+                    </ul>
+                </div>
+                <div className="mt-8">
+                     <h3 className="text-xl font-bold mb-4">Recursos Adicionales</h3>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <a href="#" className="block p-4 bg-slate-100 rounded hover:bg-slate-200 transition">
+                            <span className="font-bold block text-slate-800">CORPES XXI</span>
+                            <span className="text-sm text-slate-500">Base de datos de la RAE para usos reales.</span>
+                        </a>
+                        <a href="#" className="block p-4 bg-slate-100 rounded hover:bg-slate-200 transition">
+                            <span className="font-bold block text-slate-800">Journal of Pragmatics</span>
+                            <span className="text-sm text-slate-500">Revista académica de Elsevier.</span>
+                        </a>
+                     </div>
+                </div>
+            </div>
+        );
+
+        // --- MAIN APP COMPONENT ---
+
+        const App = () => {
+            const [currentSection, setCurrentSection] = useState('intro');
+            const [sidebarOpen, setSidebarOpen] = useState(false);
+
+            const renderSection = () => {
+                switch(currentSection) {
+                    case 'intro': return <IntroView onStart={() => setCurrentSection('ch1')} />;
+                    case 'ch1': return <Chapter1View />;
+                    case 'ch2': return <Chapter2View />;
+                    case 'case': return <CaseStudyView />;
+                    case 'glossary': return <GlossaryView />;
+                    case 'biblio': return <BiblioView />;
+                    default: return <IntroView />;
+                }
+            };
+
+            return (
+                <div className="flex h-screen overflow-hidden bg-slate-50">
+                    {/* Sidebar Navigation */}
+                    <nav className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0`}>
+                        <div className="h-full flex flex-col">
+                            <div className="p-6 border-b border-slate-100 bg-slate-900 text-white">
+                                <h1 className="text-xl font-bold serif tracking-wider">LENGUAJE<br/><span className="text-blue-400 text-sm font-sans font-light">EPISTEMOLOGÍA</span></h1>
+                            </div>
+                            <div className="flex-1 overflow-y-auto py-4">
+                                {sections.map(sec => (
+                                    <NavButton 
+                                        key={sec.id} 
+                                        active={currentSection === sec.id} 
+                                        onClick={() => { setCurrentSection(sec.id); setSidebarOpen(false); }}
+                                        icon={sec.icon}
+                                    >
+                                        {sec.title}
+                                    </NavButton>
+                                ))}
+                            </div>
+                            <div className="p-4 border-t border-slate-100 text-xs text-slate-400 text-center">
+                                Recurso Educativo Digital<br/>CECAR
+                            </div>
+                        </div>
+                    </nav>
+
+                    {/* Main Content Area */}
+                    <div className="flex-1 flex flex-col h-full overflow-hidden relative">
+                        {/* Mobile Header */}
+                        <div className="md:hidden bg-white p-4 shadow-sm flex items-center justify-between z-40">
+                            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-slate-700">
+                                <Icon name="menu" />
+                            </button>
+                            <span className="font-bold text-slate-800">Pragmática</span>
+                            <div className="w-6"></div>
+                        </div>
+
+                        {/* Content Scrollable */}
+                        <main className="flex-1 overflow-y-auto p-6 md:p-12 scroll-smooth">
+                            {renderSection()}
+                            
+                            {/* Navigation Footer for easy flow */}
+                            {currentSection !== 'intro' && (
+                                <div className="mt-16 flex justify-between border-t border-slate-200 pt-6">
+                                    <button 
+                                        onClick={() => {
+                                            const idx = sections.findIndex(s => s.id === currentSection);
+                                            if (idx > 0) setCurrentSection(sections[idx-1].id);
+                                        }}
+                                        disabled={currentSection === 'intro'}
+                                        className="text-slate-500 hover:text-blue-700 font-bold disabled:opacity-0"
+                                    >
+                                        ← Anterior
+                                    </button>
+                                    <button 
+                                        onClick={() => {
+                                            const idx = sections.findIndex(s => s.id === currentSection);
+                                            if (idx < sections.length - 1) setCurrentSection(sections[idx+1].id);
+                                        }}
+                                        disabled={currentSection === 'biblio'}
+                                        className="text-blue-700 hover:text-blue-900 font-bold disabled:opacity-0"
+                                    >
+                                        Siguiente →
+                                    </button>
+                                </div>
+                            )}
+                        </main>
+                    </div>
+                    
+                    {/* Overlay for mobile sidebar */}
+                    {sidebarOpen && (
+                        <div 
+                            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+                            onClick={() => setSidebarOpen(false)}
+                        ></div>
+                    )}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
