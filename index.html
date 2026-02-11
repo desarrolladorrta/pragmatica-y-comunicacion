@@ -129,10 +129,10 @@
                         Pragmática y <span className="text-blue-700">Comunicación</span>
                     </h1>
                     <p className="text-xl md:text-2xl text-slate-600 mb-10 font-light leading-relaxed">
-                        Un viaje interactivo desde el signo lingüístico hasta la acción social. Descubre las Funciones del Lenguaje y la Teoría de los Actos de Habla.
+                        Desde el signo lingüístico hasta la acción social. Descubre las Funciones del Lenguaje y la Teoría de los Actos de Habla.
                     </p>
                     
-                    <MediaPlaceholder type="ANIMACIÓN" width="800px" height="300px" desc="Animación conceptual: Hilos conectando personas y palabras que se transforman en acciones" />
+                    <img src="images/portada.png" alt="Desde el signo lingüístico hasta la acción social. Descubre las Funciones del Lenguaje y la Teoría de los Actos de Habla." />
 
                     <button 
                         onClick={onStart}
@@ -168,7 +168,7 @@
 
                     {activeTab === 'jakobson' && (
                         <div>
-                            <p className="mb-6 text-lg text-slate-700">Roman Jakobson (1960) vincula cada función a un factor constitutivo del acto comunicativo. Haz clic en las tarjetas para explorar.</p>
+                            <p className="mb-6 text-lg text-slate-700">Roman Jakobson (1960) vincula cada función a un factor constitutivo del acto comunicativo.</p>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {jakobsonFunctions.map((func, idx) => (
                                     <div key={idx} className="bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-500 hover:shadow-xl transition-shadow cursor-pointer group">
@@ -183,7 +183,6 @@
                                     </div>
                                 ))}
                             </div>
-                            <MediaPlaceholder type="IMAGEN" width="100%" height="400px" desc="Infografía interactiva del Esquema de la Comunicación de Jakobson conectando factores y funciones" />
                         </div>
                     )}
 
@@ -229,7 +228,7 @@
                                 <p className="text-slate-700">Solicitar narrar un mismo evento desde diferentes funciones (informe policial vs. email a amigo) desarrolla versatilidad.</p>
                              </div>
                              <div className="col-span-1 md:col-span-2">
-                                 <MediaPlaceholder type="VIDEO" width="100%" height="350px" desc="Video explicativo: Ejemplo de actividad en aula aplicando funciones del lenguaje" />
+                                 <img src="images/actividad-escrita.jpg" alt="Ejemplo de actividad escrita aplicando funciones del lenguaje" className="w-full h-auto rounded-lg shadow-md" />
                              </div>
                         </div>
                     )}
@@ -495,7 +494,7 @@
                                 ))}
                             </div>
                             <div className="p-4 border-t border-slate-100 text-xs text-slate-400 text-center">
-                                Recurso Educativo Digital<br/>2024
+                                Recurso Educativo Digital<br/>CECAR
                             </div>
                         </div>
                     </nav>
